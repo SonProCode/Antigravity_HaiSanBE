@@ -34,16 +34,17 @@ export class CartsService {
 
     if (existingItem) {
       const newWeight = Number(existingItem.weightKg) + dto.weightKg;
-      return this.prisma.cartItem.update({
+      await this.prisma.cartItem.update({
         where: { id: existingItem.id },
         data: {
           weightKg: newWeight,
           totalPrice: Math.round(newWeight * product.price),
         },
       });
+      return this.getCart(userId, sessionId);
     }
 
-    return this.prisma.cartItem.create({
+    await this.prisma.cartItem.create({
       data: {
         cartId: cart.id,
         productId: dto.productId,
@@ -52,6 +53,8 @@ export class CartsService {
         totalPrice: Math.round(dto.weightKg * product.price),
       },
     });
+
+    return this.getCart(userId, sessionId);
   }
 
   async updateItem(itemId: string, dto: UpdateCartItemDto) {
@@ -61,17 +64,37 @@ export class CartsService {
     });
     if (!item) throw new NotFoundException('Cart item not found');
 
-    return this.prisma.cartItem.update({
+    const updatedItem = await this.prisma.cartItem.update({
       where: { id: itemId },
       data: {
         weightKg: dto.weightKg,
         totalPrice: Math.round(dto.weightKg * item.product.price),
       },
     });
+
+    const cart = await this.prisma.cart.findUnique({ where: { id: updatedItem.cartId } });
+    return this.getCart(cart?.userId || undefined, cart?.sessionId || undefined);
   }
 
   async removeItem(itemId: string) {
-    return this.prisma.cartItem.delete({ where: { id: itemId } });
+    const item = await this.prisma.cartItem.findUnique({ where: { id: itemId } });
+    if (!item) throw new NotFoundException('Cart item not found');
+
+    await this.prisma.cartItem.delete({ where: { id: itemId } });
+
+    const cart = await this.prisma.cart.findUnique({ where: { id: item.cartId } });
+    return this.getCart(cart?.userId || undefined, cart?.sessionId || undefined);
+  }
+
+  async clearCart(userId?: string, sessionId?: string) {
+    const cart = await this.getCart(userId, sessionId);
+    if (!cart) throw new NotFoundException('Cart not found');
+
+    await this.prisma.cartItem.deleteMany({
+      where: { cartId: cart.id },
+    });
+
+    return this.getCart(userId, sessionId);
   }
 
   async mergeCarts(userId: string, sessionId: string) {

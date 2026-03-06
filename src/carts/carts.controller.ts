@@ -56,6 +56,15 @@ export class CartsController {
     return this.cartsService.removeItem(id);
   }
 
+  @Delete()
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiHeader({ name: 'x-session-id', required: false })
+  @ApiOperation({ summary: 'Clear the entire cart' })
+  clearCart(@Req() req: any, @Headers('x-session-id') sessionId?: string) {
+    return this.cartsService.clearCart(req.user?.userId, sessionId);
+  }
+
   @Post('merge')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
