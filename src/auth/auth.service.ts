@@ -29,12 +29,17 @@ export class AuthService {
             throw new UnauthorizedException('Account is disabled');
         }
 
-        const isMatch = await bcrypt.compare(loginDto.password, user.passwordHash);
-        if (!isMatch) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        return this.generateTokens(user.id, user.email, user.role);
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        return {
+            ...tokens,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                image: (user as any).image || null,
+            },
+        };
     }
 
     async generateTokens(userId: string, email: string, role: string) {
@@ -64,7 +69,7 @@ export class AuthService {
             },
         });
 
-        return { access_token: at, refresh_token: rt };
+        return { accessToken: at, refreshToken: rt };
     }
 
     async googleLogin(googleUser: any) {
@@ -86,7 +91,17 @@ export class AuthService {
             throw new UnauthorizedException('Account is disabled');
         }
 
-        return this.generateTokens(user.id, user.email, user.role);
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        return {
+            ...tokens,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                image: (user as any).image || null,
+            },
+        };
     }
 
     async refreshTokens(refreshToken: string) {

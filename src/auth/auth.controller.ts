@@ -23,7 +23,7 @@ export class AuthController {
 
     @Post('refresh')
     @ApiOperation({ summary: 'Refresh access token' })
-    refresh(@Body('refresh_token') refreshToken: string) {
+    refresh(@Body('refreshToken') refreshToken: string) {
         if (!refreshToken) throw new UnauthorizedException('Refresh token is required');
         return this.authService.refreshTokens(refreshToken);
     }
