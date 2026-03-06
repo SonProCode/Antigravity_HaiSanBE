@@ -36,6 +36,14 @@ export class OrdersController {
     return this.ordersService.create(req.user?.userId, createOrderDto);
   }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user orders' })
+  findAllMine(@Req() req: any) {
+    return this.ordersService.findByUser(req.user.userId);
+  }
+
   @Get('track/:orderCode')
   @ApiOperation({ summary: 'Track order by order code' })
   track(@Param('orderCode') orderCode: string) {
