@@ -46,32 +46,36 @@ async function main() {
     );
 
     // 4. Create Products
-    const categories: Category[] = [
-        Category.TOM,
-        Category.CA,
-        Category.MUC,
-        Category.CUA,
-        Category.PREMIUM,
+    const SEAFOOD_PRODUCTS = [
+        { name: 'Tôm Hùm Bông', category: Category.TOM, price: 1500000, originalPrice: 1800000, img: 'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?q=80&w=800' },
+        { name: 'Cua Cà Mau', category: Category.CUA, price: 450000, originalPrice: 550000, img: 'https://images.unsplash.com/photo-1551462147-37885acc3c41?q=80&w=800' },
+        { name: 'Mực Lá Tươi', category: Category.MUC, price: 350000, originalPrice: 400000, img: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=800' },
+        { name: 'Cá Thu Phấn', category: Category.CA, price: 250000, originalPrice: 300000, img: 'https://images.unsplash.com/photo-1534604973900-c41ab4c5e636?q=80&w=800' },
+        { name: 'Bào Ngư Hàn Quốc', category: Category.PREMIUM, price: 850000, originalPrice: 1000000, img: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?q=80&w=800' },
+        { name: 'Tôm Sú CP', category: Category.TOM, price: 280000, originalPrice: 350000, img: 'https://images.unsplash.com/photo-1553649033-3fbc8d0fa3cb?q=80&w=800' },
+        { name: 'Ghẹ Xanh Loại 1', category: Category.CUA, price: 550000, originalPrice: 650000, img: 'https://images.unsplash.com/photo-1623340517766-3d719548489c?q=80&w=800' },
+        { name: 'Cá Song Hổ', category: Category.CA, price: 420000, originalPrice: 480000, img: 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=800' },
+        { name: 'Mực Nháy Cửa Lò', category: Category.MUC, price: 500000, originalPrice: 600000, img: 'https://images.unsplash.com/photo-1604328698692-f76ea9498e76?q=80&w=800' },
+        { name: 'Ốc Hương Cồ', category: Category.PREMIUM, price: 680000, originalPrice: 750000, img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800' },
     ];
 
     const products = await Promise.all(
-        Array.from({ length: 20 }).map((_, i) => {
-            const name = faker.commerce.productName();
+        SEAFOOD_PRODUCTS.map((p, i) => {
             return prisma.product.create({
                 data: {
-                    name,
-                    slug: `${faker.helpers.slugify(name).toLowerCase()}-${i}`,
-                    description: faker.commerce.productDescription(),
-                    price: faker.number.int({ min: 100000, max: 2000000 }),
-                    originalPrice: faker.number.int({ min: 2000000, max: 3000000 }),
-                    category: faker.helpers.arrayElement(categories),
-                    inventoryKg: faker.number.float({ min: 10, max: 100, fractionDigits: 2 }),
-                    isBestSeller: faker.datatype.boolean(),
+                    name: p.name,
+                    slug: `${faker.helpers.slugify(p.name).toLowerCase()}-${i}`,
+                    description: `${p.name} tươi ngon đánh bắt trong ngày từ vùng biển Quảng Ninh. Đảm bảo chất lượng, không chất bảo quản.`,
+                    price: p.price,
+                    originalPrice: p.originalPrice,
+                    category: p.category,
+                    inventoryKg: Math.round((Math.random() * 90 + 10) * 100) / 100,
+                    isBestSeller: i < 4,
                     images: {
-                        create: Array.from({ length: 3 }).map((_, idx) => ({
-                            url: `https://picsum.photos/seed/${idx + i}/600/400`,
-                            position: idx,
-                        })),
+                        create: [
+                            { url: p.img, position: 0 },
+                            { url: `https://picsum.photos/seed/${i + 100}/600/400`, position: 1 },
+                        ],
                     },
                 },
             });
@@ -80,13 +84,13 @@ async function main() {
 
     // 5. Create Orders
     for (const user of users) {
-        const numOrders = faker.number.int({ min: 1, max: 3 });
+        const numOrders = faker.number.int({ min: 1, max: 2 });
         for (let j = 0; j < numOrders; j++) {
             const selectedProducts = faker.helpers.arrayElements(products, { min: 1, max: 3 });
             let subtotal = 0;
 
             const orderItems = selectedProducts.map(p => {
-                const weight = faker.number.float({ min: 0.5, max: 2, fractionDigits: 1 });
+                const weight = Math.round((Math.random() * 2 + 1) * 10) / 10;
                 const price = Number(p.price);
                 const total = Math.round(weight * price);
                 subtotal += total;
@@ -99,30 +103,29 @@ async function main() {
             });
 
             const shippingFee = subtotal > 1000000 ? 0 : 50000;
-            const tax = Math.round(subtotal * 0.1);
+            const tax = 0;
             const total = subtotal + shippingFee + tax;
 
             await prisma.order.create({
                 data: {
-                    orderCode: `HAI-2026-${faker.string.alphanumeric(5).toUpperCase()}`,
+                    orderCode: `HSQ-${faker.string.alphanumeric(6).toUpperCase()}`,
                     userId: user.id,
-                    customerName: user.name || 'Customer',
-                    customerPhone: '0987123456',
+                    customerName: user.name || 'Khách hàng',
+                    customerPhone: '098' + faker.string.numeric(7),
                     shippingAddress: {
-                        province: 'Quang Ninh',
-                        district: 'Ha Long',
-                        ward: 'Hong Gai',
-                        address: faker.location.streetAddress(),
+                        province: 'Quảng Ninh',
+                        district: 'Hạ Long',
+                        ward: 'Hồng Gai',
+                        address: 'Số ' + faker.number.int({ min: 1, max: 200 }) + ' Đường Lê Thánh Tông',
                     } as any,
                     subtotal,
                     shippingFee,
                     tax,
                     total,
                     paymentMethod: PaymentMethod.COD,
-                    status: OrderStatus.DELIVERED,
+                    status: j === 0 ? OrderStatus.DELIVERED : OrderStatus.PENDING,
                     statusTimeline: [
-                        { status: OrderStatus.PENDING, timestamp: new Date().toISOString(), note: 'Placed' },
-                        { status: OrderStatus.DELIVERED, timestamp: new Date().toISOString(), note: 'Delivered' },
+                        { status: OrderStatus.PENDING, timestamp: new Date().toISOString(), note: 'Đã đặt hàng' },
                     ] as any,
                     items: {
                         create: orderItems,
