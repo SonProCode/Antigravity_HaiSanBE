@@ -7,15 +7,17 @@ export class CartsService {
   constructor(private prisma: PrismaService) { }
 
   async getCart(userId?: string, sessionId?: string) {
+    if (!userId && !sessionId) return null;
+
     const where: any = userId ? { userId } : { sessionId: sessionId || '' };
     let cart = await this.prisma.cart.findUnique({
       where,
       include: { items: { include: { product: { include: { images: true } } } } },
     });
 
-    if (!cart && sessionId) {
+    if (!cart) {
       cart = await this.prisma.cart.create({
-        data: { sessionId },
+        data: userId ? { userId } : { sessionId: sessionId! },
         include: { items: { include: { product: { include: { images: true } } } } },
       });
     }
