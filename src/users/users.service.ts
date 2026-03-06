@@ -13,7 +13,16 @@ export class UsersService {
       where: { email: createUserDto.email },
     });
     if (existing) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Email đã được sử dụng');
+    }
+
+    if (createUserDto.phone) {
+      const existingPhone = await this.prisma.user.findUnique({
+        where: { phone: createUserDto.phone },
+      });
+      if (existingPhone) {
+        throw new ConflictException('Số điện thoại đã được sử dụng');
+      }
     }
 
     const { password, ...userData } = createUserDto;
