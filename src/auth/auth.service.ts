@@ -29,6 +29,11 @@ export class AuthService {
             throw new UnauthorizedException('Account is disabled');
         }
 
+        const isMatch = await bcrypt.compare(loginDto.password, user.passwordHash);
+        if (!isMatch) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
         const tokens = await this.generateTokens(user.id, user.email, user.role);
         return {
             ...tokens,
