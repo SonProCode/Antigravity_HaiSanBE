@@ -150,12 +150,17 @@ export class OrdersService {
     return { data, total, page: +page, totalPages: Math.ceil(total / pageSize) };
   }
 
-  async findByCode(orderCode: string) {
+  async findByCodeAndPhone(orderCode: string, phone: string) {
+    if (!phone) throw new BadRequestException('Vui lòng nhập số điện thoại');
+
     const order = await this.prisma.order.findUnique({
       where: { orderCode },
       include: { items: { include: { product: true } } },
     });
-    if (!order) throw new NotFoundException('Order not found');
+
+    if (!order || order.customerPhone !== phone) {
+      throw new NotFoundException('Không tìm thấy đơn hàng hoặc số điện thoại không khớp');
+    }
     return order;
   }
 

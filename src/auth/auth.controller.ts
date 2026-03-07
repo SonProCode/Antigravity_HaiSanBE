@@ -1,7 +1,8 @@
-import { Controller, Post, Body, UseGuards, Get, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, Patch, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { LoginDto, RegisterDto, ChangePasswordDto } from './dto/auth.dto';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Auth')
@@ -39,6 +40,14 @@ export class AuthController {
     @ApiOperation({ summary: 'Login with Google' })
     async googleAuth() {
         // Redirects to Google
+    }
+
+    @Patch('change-password')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: 'Change user password' })
+    async changePassword(@Req() req: any, @Body() dto: ChangePasswordDto) {
+        return this.authService.changePassword(req.user.sub, dto.oldPassword, dto.newPassword);
     }
 
     @Get('google/callback')

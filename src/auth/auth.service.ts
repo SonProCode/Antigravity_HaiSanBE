@@ -138,4 +138,27 @@ export class AuthService {
         }
         return { message: 'Logged out successfully' };
     }
+
+    async changePassword(userId: string, oldPassword: string, newPassword: string) {
+        const user = await this.usersService.findOne(userId);
+        if (!user || !user.passwordHash) {
+            throw new BadRequestException('User does not have a password set');
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+        if (!isMatch) {
+            throw new UnauthorizedException('Mật khẩu hiện tại không chính xác');
+        }
+
+        const newPasswordHash = await bcrypt.hash(newPassword, 10);
+        await this.usersService.update(userId, { password: newPasswordHash } as any);
+
+        // Use Prisma directly to update just the hash since UpdateUserDto might not expose it
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { passwordHash: newPasswordHash }
+        });
+
+        return { message: 'Đổi mật khẩu thành công' };
+    }
 }

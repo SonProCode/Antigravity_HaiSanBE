@@ -45,9 +45,10 @@ export class OrdersController {
   }
 
   @Get('track/:orderCode')
-  @ApiOperation({ summary: 'Track order by order code' })
-  track(@Param('orderCode') orderCode: string) {
-    return this.ordersService.findByCode(orderCode);
+  @ApiOperation({ summary: 'Track order by order code and phone' })
+  @ApiQuery({ name: 'phone', required: true, description: 'Customer phone number used for the order' })
+  track(@Param('orderCode') orderCode: string, @Query('phone') phone: string) {
+    return this.ordersService.findByCodeAndPhone(orderCode, phone);
   }
 
   @Get()
