@@ -28,7 +28,7 @@ export class OrdersService {
     }
 
     // Begin Transaction
-    return this.prisma.$transaction(async (tx) => {
+    const order = await this.prisma.$transaction(async (tx) => {
       let subtotal = 0;
       const orderItemsData: any[] = [];
 
@@ -84,7 +84,7 @@ export class OrdersService {
         .substring(2, 7)
         .toUpperCase()}`;
 
-      const order = await tx.order.create({
+      const newOrder = await tx.order.create({
         data: {
           orderCode,
           userId,
@@ -116,15 +116,26 @@ export class OrdersService {
       // Clear cart
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
 
-      // Queue notification job
+      return newOrder;
+    });
+
+    // Post-transaction side effects (Don't block the core transaction)
+    try {
       await this.orderQueue.add('send-confirmation', {
         orderId: order.id,
-        email: userId ? (await tx.user.findUnique({ where: { id: userId } }))?.email : null,
+        email: userId ? (await this.prisma.user.findUnique({ where: { id: userId } }))?.email : null,
         phone: order.customerPhone,
+      }, {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 1000 },
+        removeOnComplete: true,
       });
+    } catch (error) {
+      console.error('Failed to add order to queue:', error);
+      // We don't throw here to ensure the user still gets a success response
+    }
 
-      return order;
-    });
+    return order;
   }
 
   async findAll(query: { status?: OrderStatus; q?: string; page?: number; pageSize?: number; userType?: 'guest' | 'member' }) {

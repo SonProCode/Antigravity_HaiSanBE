@@ -23,7 +23,17 @@ import { AdminModule } from './admin/admin.module';
       useFactory: (configService: ConfigService) => {
         const redisUrl = configService.get('REDIS_URL');
         return {
-          connection: redisUrl ? { url: redisUrl } : { host: 'localhost', port: 6379 },
+          connection: redisUrl
+            ? {
+              url: redisUrl,
+              maxRetriesPerRequest: null,
+              enableReadyCheck: false,
+            }
+            : {
+              host: 'localhost',
+              port: 6379,
+              maxRetriesPerRequest: null,
+            },
         };
       },
     }),
