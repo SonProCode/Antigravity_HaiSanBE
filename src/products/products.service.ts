@@ -51,12 +51,14 @@ export class ProductsService {
             sort,
         } = query;
 
-        const isBestSellerBool = isBestSeller === 'true' || isBestSeller === true;
+        // Support aliases and handle boolean conversion
+        const rawBestSeller = isBestSeller ?? (query as any).featured ?? (query as any).bestSeller;
+        const isBestSellerBool = rawBestSeller === 'true' || rawBestSeller === true;
 
         const where: Prisma.ProductWhereInput = {
             deletedAt: null,
             ...(category && { category }),
-            ...(isBestSeller !== undefined && { isBestSeller: isBestSellerBool }),
+            ...(rawBestSeller !== undefined && { isBestSeller: isBestSellerBool }),
             ...(q && {
                 OR: [
                     { name: { contains: q, mode: 'insensitive' } },
