@@ -1,14 +1,23 @@
 # Deployment Guide (Production)
 
-## 1. Dành cho Backend (NestJS lên Render)
-1. Commit toàn bộ thay đổi và push lên nhánh `main` của repository Backend.
-2. Truy cập [Render Dashboard](https://dashboard.render.com).
-3. Chọn **New +** -> **Blueprint**.
-4. Chọn repository `Antigravity_HaiSanBE`. Render sẽ tự động đọc file `render.yaml` và cài đặt Web Service.
-5. Cập nhật các biến môi trường (Environment Variables) bị thiếu trong Render Dashboard (phần Settings > Environment):
+## 1. Dành cho Backend (NestJS lên Render - Free Tier)
+1. Truy cập [Render Dashboard](https://dashboard.render.com).
+2. Chọn **New +** -> **Web Service**.
+3. Kết nối với tài khoản GitHub và chọn repository `Antigravity_HaiSanBE`.
+4. Cấu hình các thông số cơ bản cho Web Service:
+   - **Name**: `haisan-backend` (hoặc tuỳ ý)
+   - **Environment**: `Node`
+   - **Build Command**: `npm install && npx prisma generate && npm run build`
+   - **Start Command**: `npm run start:prod`
+   - **Instance Type**: Chọn gói **Free** ($0/month)
+5. Kéo xuống phần **Environment Variables** (hoặc chọn tab Environment), thêm các biến sau:
+   - `NODE_ENV`: `production`
+   - `PORT`: `3000`
    - `DATABASE_URL`: `postgresql://neondb_owner:npg_SmIdA37HiBlj@ep-little-recipe-a1pz6dbj-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
    - `DIRECT_URL`: Cùng giá trị trên (hoặc dùng direct connection của Neon nếu migration gặp lỗi).
    - `JWT_SECRET`: Một chuỗi bí mật bất kỳ (VD: `super_secret_jwt_key_2026_haisan`).
+   - `FRONTEND_URL`: `https://antigravity-haisanfe.vercel.app` (Lưu ý: Không để dấu `/` ở cuối)
+6. Nhấn **Create Web Service** và chờ Render cài đặt.
 
 ## 2. Dành cho Frontend (Next.js lên Vercel)
 1. Commit toàn bộ thay đổi và push lên nhánh `main` của repository Frontend.
