@@ -15,7 +15,7 @@ export class CreateOrderDto {
 
     @IsString()
     @IsNotEmpty()
-    @IsPhoneNumber('VN')
+    // @IsPhoneNumber('VN')
     customerPhone: string;
 
     @IsObject()
