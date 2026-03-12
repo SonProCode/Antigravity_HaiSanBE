@@ -28,6 +28,13 @@ import { AdminModule } from './admin/admin.module';
               url: redisUrl,
               maxRetriesPerRequest: null,
               enableReadyCheck: false,
+              connectTimeout: 30000, // 30 seconds
+              keepAlive: 30000,      // 30 seconds
+              tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+              retryStrategy: (times: number) => {
+                // Exponential backoff or simple gradual retry
+                return Math.min(times * 100, 3000);
+              },
             }
             : {
               host: 'localhost',
