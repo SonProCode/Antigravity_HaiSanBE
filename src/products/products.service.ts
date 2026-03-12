@@ -37,7 +37,7 @@ export class ProductsService {
         q?: string;
         minPrice?: number;
         maxPrice?: number;
-        isBestSeller?: boolean;
+        isBestSeller?: any;
         sort?: string;
     }) {
         const {
