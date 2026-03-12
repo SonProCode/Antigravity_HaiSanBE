@@ -7,7 +7,7 @@
 4. Cấu hình các thông số cơ bản cho Web Service:
    - **Name**: `haisan-backend` (hoặc tuỳ ý)
    - **Environment**: `Node`
-   - **Build Command**: `npm install && npx prisma generate && npm run build`
+   - **Build Command**: `npm install --include=dev && npx prisma generate && npm run build`
    - **Start Command**: `npm run start:prod`
    - **Instance Type**: Chọn gói **Free** ($0/month)
 5. Kéo xuống phần **Environment Variables** (hoặc chọn tab Environment), thêm các biến sau:
