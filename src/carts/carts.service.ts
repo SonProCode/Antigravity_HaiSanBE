@@ -16,6 +16,19 @@ export class CartsService {
     });
 
     if (!cart) {
+      if (userId) {
+        // Double check user exists to avoid FK error
+        const userExists = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!userExists) {
+          // If user doesn't exist, we can't create a user cart. 
+          // Revert to guest cart if sessionId is available, or return null
+          if (sessionId) {
+            return this.getCart(undefined, sessionId);
+          }
+          return null;
+        }
+      }
+
       cart = await this.prisma.cart.create({
         data: userId ? { userId } : { sessionId: sessionId! },
         include: { items: { include: { product: { include: { images: true } } } } },
