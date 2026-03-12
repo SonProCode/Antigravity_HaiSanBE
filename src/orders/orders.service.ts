@@ -75,7 +75,7 @@ export class OrdersService {
         });
       }
 
-      const shippingFee = subtotal > 1000000 ? 0 : 50000;
+      const shippingFee = subtotal >= 1000000 ? 0 : 50000;
       const tax = Math.round(subtotal * 0.1); // 10% VAT
       const total = subtotal + shippingFee + tax;
 
@@ -127,10 +127,12 @@ export class OrdersService {
     });
   }
 
-  async findAll(query: { status?: OrderStatus; q?: string; page?: number; pageSize?: number }) {
-    const { status, q, page = 1, pageSize = 20 } = query;
+  async findAll(query: { status?: OrderStatus; q?: string; page?: number; pageSize?: number; userType?: 'guest' | 'member' }) {
+    const { status, q, page = 1, pageSize = 20, userType } = query;
     const where = {
       ...(status && { status }),
+      ...(userType === 'guest' && { userId: null }),
+      ...(userType === 'member' && { userId: { not: null } }),
       ...(q && {
         OR: [{ orderCode: { contains: q, mode: 'insensitive' } as any }, { customerPhone: { contains: q, mode: 'insensitive' } as any }],
       }),

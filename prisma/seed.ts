@@ -33,7 +33,7 @@ async function main() {
     // 3. Create Users
     const userPassword = await bcrypt.hash('password123', 10);
     const users = await Promise.all(
-        Array.from({ length: 5 }).map(() =>
+        Array.from({ length: 9 }).map(() =>
             prisma.user.create({
                 data: {
                     email: faker.internet.email(),
@@ -46,7 +46,7 @@ async function main() {
     );
 
     // 4. Create Products
-    const SEAFOOD_PRODUCTS = [
+    const SEAFOOD_PRODUCTS: Array<{ name: string, category: Category, price: number, originalPrice: number, img: string }> = [
         { name: 'Tôm Hùm Bông', category: Category.TOM, price: 1500000, originalPrice: 1800000, img: 'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?q=80&w=800' },
         { name: 'Cua Cà Mau', category: Category.CUA, price: 450000, originalPrice: 550000, img: 'https://images.unsplash.com/photo-1551462147-37885acc3c41?q=80&w=800' },
         { name: 'Mực Lá Tươi', category: Category.MUC, price: 350000, originalPrice: 400000, img: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=800' },
@@ -58,6 +58,17 @@ async function main() {
         { name: 'Mực Nháy Cửa Lò', category: Category.MUC, price: 500000, originalPrice: 600000, img: 'https://images.unsplash.com/photo-1604328698692-f76ea9498e76?q=80&w=800' },
         { name: 'Ốc Hương Cồ', category: Category.PREMIUM, price: 680000, originalPrice: 750000, img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800' },
     ];
+
+    // Generate 20 more mock products to total 30
+    for (let i = 0; i < 20; i++) {
+        SEAFOOD_PRODUCTS.push({
+            name: `${faker.helpers.arrayElement(['Tôm', 'Cua', 'Cá', 'Mực', 'Bạch Tuộc', 'Ốc', 'Nghêu', 'Sò'])} ${faker.commerce.productAdjective()} ${i}`,
+            category: faker.helpers.arrayElement(Object.values(Category)),
+            price: parseInt(faker.commerce.price({ min: 100000, max: 1000000, dec: 0 })),
+            originalPrice: parseInt(faker.commerce.price({ min: 110000, max: 1500000, dec: 0 })),
+            img: `https://picsum.photos/seed/${i + 200}/600/400`,
+        });
+    }
 
     const products = await Promise.all(
         SEAFOOD_PRODUCTS.map((p, i) => {

@@ -58,6 +58,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'List all orders (Admin only)' })
   @ApiQuery({ name: 'status', enum: OrderStatus, required: false })
   @ApiQuery({ name: 'q', required: false, description: 'Search by orderCode or phone' })
+  @ApiQuery({ name: 'userType', enum: ['guest', 'member'], required: false })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'pageSize', required: false })
   findAll(@Query() query: any) {

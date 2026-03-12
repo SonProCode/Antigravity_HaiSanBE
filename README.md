@@ -1,67 +1,27 @@
-# Hai San Quang Ninh - Backend API
+# Deployment Guide (Production)
 
-Robust NestJS backend for a seafood e-commerce platform.
+## 1. Dành cho Backend (NestJS lên Render)
+1. Commit toàn bộ thay đổi và push lên nhánh `main` của repository Backend.
+2. Truy cập [Render Dashboard](https://dashboard.render.com).
+3. Chọn **New +** -> **Blueprint**.
+4. Chọn repository `Antigravity_HaiSanBE`. Render sẽ tự động đọc file `render.yaml` và cài đặt Web Service.
+5. Cập nhật các biến môi trường (Environment Variables) bị thiếu trong Render Dashboard (phần Settings > Environment):
+   - `DATABASE_URL`: `postgresql://neondb_owner:npg_SmIdA37HiBlj@ep-little-recipe-a1pz6dbj-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
+   - `DIRECT_URL`: Cùng giá trị trên (hoặc dùng direct connection của Neon nếu migration gặp lỗi).
+   - `JWT_SECRET`: Một chuỗi bí mật bất kỳ (VD: `super_secret_jwt_key_2026_haisan`).
 
-## Features
+## 2. Dành cho Frontend (Next.js lên Vercel)
+1. Commit toàn bộ thay đổi và push lên nhánh `main` của repository Frontend.
+2. Truy cập [Vercel Dashboard](https://vercel.com/dashboard).
+3. Chọn **Add New...** -> **Project**.
+4. Import repository `Antigravity_HaiSanFe`.
+5. Trong phần **Environment Variables**, thêm:
+   - `NEXT_PUBLIC_API_URL`: URL mà Render cung cấp cho Backend (ví dụ: `https://haisan-backend-xxxx.onrender.com/api`).
+6. Nhấn **Deploy**.
 
-- **Auth**: JWT (Access/Refresh Tokens) + Google OAuth 2.0.
-- **DB**: PostgreSQL with Prisma ORM.
-- **Cache & Queue**: Redis + BullMQ for background jobs.
-- **Monitoring**: Prometheus metrics + Healthchecks (Terminus).
-- **Security**: RBAC (User/Admin), Passport strategies, Helmet, CORS.
-- **Documentation**: Swagger UI at `/docs`.
-- **Logging**: Structured winston logs.
+## 3. Quá trình CI/CD
+* Cả 2 kho lưu trữ đều đã được cấu hình `.github/workflows/deploy.yml`. Mỗi khi bạn Push code lên nhánh `main`, Github Actions sẽ tự động kiểm tra xem ứng dụng có Build thành công hay không.
+* Vercel và Render cũng sẽ tự động build và deploy lên Production mỗi khi có sự thay đổi trên nhánh `main`.
 
-## Tech Stack
-
-- NestJS 10+
-- Prisma 6
-- PostgreSQL 15
-- Redis 7
-- BullMQ
-- Swagger/OpenAPI
-
-## Setup & Development
-
-### 1. Requirements
-- Node.js 20+
-- Docker Desktop (for Postgres & Redis)
-
-### 2. Installation
-```bash
-npm install
-```
-
-### 3. Infrastructure
-Start Postgres and Redis:
-```bash
-docker compose -f docker-compose.dev.yml up -d
-```
-
-### 4. Database Setup
-```bash
-npx prisma migrate dev
-npm run seed
-```
-
-### 5. Run
-```bash
-npm run start:dev
-```
-
-## API Documentation
-Once running, visit: `http://localhost:3001/docs`
-
-## Admin Credentials (Seeded)
-- **Email**: `admin@haisan.vn`
-- **Password**: `admin123`
-
-## Directory Structure
-- `src/auth`: JWT & Google OAuth logic.
-- `src/users`: User management.
-- `src/products`: Seafood catalog with slug/filtering.
-- `src/carts`: Guest/User cart logic & merging.
-- `src/orders`: Transactional ordering & inventory checks.
-- `src/jobs`: Background BullMQ processors.
-- `src/admin`: Dashboard stats & analytics.
-- `src/common`: Global filters, interceptors, and utilities.
+## 4. Kiểm tra sức khoẻ (Health Check)
+Sau khi Backend deploy thành công, truy cập `https://haisan-backend-xxxx.onrender.com/api/health` sẽ thấy `{ "status": "ok" }`.
