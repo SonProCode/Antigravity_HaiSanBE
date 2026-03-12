@@ -51,10 +51,12 @@ export class ProductsService {
             sort,
         } = query;
 
+        const isBestSellerBool = isBestSeller === 'true' || isBestSeller === true;
+
         const where: Prisma.ProductWhereInput = {
             deletedAt: null,
             ...(category && { category }),
-            ...(isBestSeller !== undefined && { isBestSeller }),
+            ...(isBestSeller !== undefined && { isBestSeller: isBestSellerBool }),
             ...(q && {
                 OR: [
                     { name: { contains: q, mode: 'insensitive' } },
