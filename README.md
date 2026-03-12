@@ -13,11 +13,15 @@
 5. Kéo xuống phần **Environment Variables** (hoặc chọn tab Environment), thêm các biến sau:
    - `NODE_ENV`: `production`
    - `PORT`: `3000`
-   - `DATABASE_URL`: `postgresql://neondb_owner:npg_SmIdA37HiBlj@ep-little-recipe-a1pz6dbj-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
-   - `DIRECT_URL`: Cùng giá trị trên (hoặc dùng direct connection của Neon nếu migration gặp lỗi).
+   - `DATABASE_URL`: `postgresql://neondb_owner:npg_SmIdA37HiBlj@ep-little-recipe-a1pz6dbj-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&pgbouncer=true`
+   - `DIRECT_URL`: `postgresql://neondb_owner:npg_SmIdA37HiBlj@ep-little-recipe-a1pz6dbj.ap-southeast-1.aws.neon.tech/neondb?sslmode=require` (Lưu ý: Không dùng `-pooler` cho DIRECT_URL)
+   - `REDIS_URL`: Bạn cần một Redis Server (Render Free không có sẵn). Hãy đăng ký một tài khoản miễn phí tại [Upstash](https://upstash.com/) và copy chuỗi `redis://...` dán vào đây.
    - `JWT_SECRET`: Một chuỗi bí mật bất kỳ (VD: `super_secret_jwt_key_2026_haisan`).
    - `FRONTEND_URL`: `https://antigravity-haisanfe.vercel.app` (Lưu ý: Không để dấu `/` ở cuối)
-6. Nhấn **Create Web Service** và chờ Render cài đặt.
+6. **Lưu ý về Database (Neon)**:
+   - Nếu bạn dùng URL có `-pooler`, hãy thêm `&pgbouncer=true` vào cuối `DATABASE_URL`.
+   - Đối với `DIRECT_URL`, tuyệt đối không dùng URL có `-pooler`.
+7. Nhấn **Create Web Service** và chờ Render cài đặt.
 
 ## 2. Dành cho Frontend (Next.js lên Vercel)
 1. Commit toàn bộ thay đổi và push lên nhánh `main` của repository Frontend.

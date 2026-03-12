@@ -20,11 +20,12 @@ import { AdminModule } from './admin/admin.module';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        connection: {
-          url: configService.get('REDIS_URL'),
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const redisUrl = configService.get('REDIS_URL');
+        return {
+          connection: redisUrl ? { url: redisUrl } : { host: 'localhost', port: 6379 },
+        };
+      },
     }),
     PrismaModule,
     CommonModule,
