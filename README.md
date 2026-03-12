@@ -26,6 +26,7 @@
 4. Import repository `Antigravity_HaiSanFe`.
 5. Trong phần **Environment Variables**, thêm:
    - `NEXT_PUBLIC_API_URL`: URL mà Render cung cấp cho Backend (ví dụ: `https://haisan-backend-xxxx.onrender.com/api`).
+   - `AUTH_SECRET`: Một chuỗi ngẫu nhiên sinh ra bằng lệnh `openssl rand -base64 32` (Đây là yêu cầu bắt buộc của NextAuth v5).
 6. Nhấn **Deploy**.
 
 ## 3. Quá trình CI/CD

@@ -52,15 +52,15 @@ export class AuthService {
             this.jwtService.signAsync(
                 { sub: userId, email, role },
                 {
-                    secret: this.configService.get('JWT_ACCESS_SECRET'),
-                    expiresIn: this.configService.get('JWT_ACCESS_EXPIRES_IN'),
+                    secret: this.configService.get('JWT_ACCESS_SECRET') || this.configService.get('JWT_SECRET'),
+                    expiresIn: this.configService.get('JWT_ACCESS_EXPIRES_IN') || '1d',
                 },
             ),
             this.jwtService.signAsync(
                 { sub: userId, email, role },
                 {
-                    secret: this.configService.get('JWT_REFRESH_SECRET'),
-                    expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
+                    secret: this.configService.get('JWT_REFRESH_SECRET') || this.configService.get('JWT_SECRET'),
+                    expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') || '7d',
                 },
             ),
         ]);
@@ -111,7 +111,7 @@ export class AuthService {
 
     async refreshTokens(refreshToken: string) {
         const payload = await this.jwtService.verifyAsync(refreshToken, {
-            secret: this.configService.get('JWT_REFRESH_SECRET'),
+            secret: this.configService.get('JWT_REFRESH_SECRET') || this.configService.get('JWT_SECRET'),
         });
 
         const storedToken = await this.prisma.refreshToken.findUnique({
