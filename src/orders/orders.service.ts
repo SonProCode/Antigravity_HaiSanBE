@@ -53,7 +53,7 @@ export class OrdersService {
           where: { id: product.id },
           data: {
             inventoryKg: { decrement: item.weightKg },
-            soldCount: { increment: 1 },
+            soldCount: { increment: Math.floor(Number(item.weightKg)) || 1 },
           },
         });
 
