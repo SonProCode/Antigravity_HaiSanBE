@@ -59,14 +59,23 @@ async function main() {
         { name: 'Ốc Hương Cồ', category: Category.PREMIUM, price: 680000, originalPrice: 750000, img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800' },
     ];
 
-    // Generate 20 more mock products to total 30
+    // Generate 20 more mock products with smart categorization
+    const seafoodTypes = [
+        { name: 'Tôm', cat: Category.TOM, imgs: ['https://images.unsplash.com/photo-1553649033-3fbc8d0fa3cb?w=800', 'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=800'] },
+        { name: 'Cá', cat: Category.CA, imgs: ['https://images.unsplash.com/photo-1534604973900-c41ab4c5e636?w=800', 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?w=800'] },
+        { name: 'Mực', cat: Category.MUC, imgs: ['https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800', 'https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=800'] },
+        { name: 'Cua', cat: Category.CUA, imgs: ['https://images.unsplash.com/photo-1551462147-37885acc3c41?w=800', 'https://images.unsplash.com/photo-1623340517766-3d719548489c?w=800'] },
+        { name: 'Ốc', cat: Category.OTHER, imgs: ['https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800'] },
+    ];
+
     for (let i = 0; i < 20; i++) {
+        const type = faker.helpers.arrayElement(seafoodTypes);
         SEAFOOD_PRODUCTS.push({
-            name: `${faker.helpers.arrayElement(['Tôm', 'Cua', 'Cá', 'Mực', 'Bạch Tuộc', 'Ốc', 'Nghêu', 'Sò'])} ${faker.commerce.productAdjective()} ${i}`,
-            category: faker.helpers.arrayElement(Object.values(Category)),
+            name: `${type.name} ${faker.commerce.productAdjective()} ${i}`,
+            category: type.cat,
             price: parseInt(faker.commerce.price({ min: 100000, max: 1000000, dec: 0 })),
             originalPrice: parseInt(faker.commerce.price({ min: 110000, max: 1500000, dec: 0 })),
-            img: `https://picsum.photos/seed/${i + 200}/600/400`,
+            img: faker.helpers.arrayElement(type.imgs),
         });
     }
 

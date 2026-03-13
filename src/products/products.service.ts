@@ -55,9 +55,18 @@ export class ProductsService {
         const rawBestSeller = isBestSeller ?? (query as any).featured ?? (query as any).bestSeller;
         const isBestSellerBool = rawBestSeller === 'true' || rawBestSeller === true;
 
+        // Robust category handling
+        let finalCategory = category;
+        if (typeof category === 'string') {
+            const upper = category.toUpperCase();
+            if (Object.values(Category).includes(upper as Category)) {
+                finalCategory = upper as Category;
+            }
+        }
+
         const where: Prisma.ProductWhereInput = {
             deletedAt: null,
-            ...(category && { category }),
+            ...(finalCategory && { category: finalCategory as Category }),
             ...(rawBestSeller !== undefined && { isBestSeller: isBestSellerBool }),
             ...(q && {
                 OR: [
