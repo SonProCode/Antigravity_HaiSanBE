@@ -9,6 +9,7 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
+import { UploadModule } from './upload/upload.module';
 import { CartsModule } from './carts/carts.module';
 import { OrdersModule } from './orders/orders.module';
 import { JobsModule } from './jobs/jobs.module';
@@ -50,6 +51,7 @@ import { AdminModule } from './admin/admin.module';
     AuthModule,
     UsersModule,
     ProductsModule,
+    UploadModule,
     CartsModule,
     OrdersModule,
     JobsModule,
